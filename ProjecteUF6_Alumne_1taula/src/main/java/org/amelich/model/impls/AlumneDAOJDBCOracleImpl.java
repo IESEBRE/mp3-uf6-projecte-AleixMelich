@@ -69,7 +69,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         ) {
 
             while (rs.next()) {
-                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota")));
+                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"),rs.getBoolean("fct")));
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
@@ -90,6 +90,21 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
 
     @Override
     public void save(Alumne obj) throws DAOException {
-
+        String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
+        try (Connection con = DriverManager.getConnection(
+                "jdbc:oracle:thin:@//localhost:1521/xe",
+                "C##HR",
+                "HR"
+        );
+             PreparedStatement st = con.prepareStatement(insertSQL);
+        ) {
+            st.setLong(1, obj.getId());
+            st.setString(2, obj.getNomCognom());
+            st.setDouble(3, obj.getNota());
+            st.setBoolean(4, obj.isFct());
+            st.executeUpdate();
+        } catch (SQLException throwables) {
+            throw new DAOException(1);
+        }
     }
 }

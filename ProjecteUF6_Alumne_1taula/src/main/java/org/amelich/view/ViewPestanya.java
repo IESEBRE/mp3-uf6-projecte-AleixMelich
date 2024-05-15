@@ -57,7 +57,7 @@ public class ViewPestanya extends JFrame{
         this.setContentPane(panel); // DEFINIM EL PANEL QUE CONTÉ TOTS ELS ELEMENTS
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // PERMETRE TANCAR LA FINESTRA
         this.pack(); // AJUSTAR LA FINESTRA AL CONTINGUT
-        this.setVisible(true); // FER VISIBLE LA FINESTRA
+        this.setVisible(false); // FER VISIBLE LA FINESTRA
         this.setSize(800, 600); // DEFINIM LA MIDA DE LA FINESTRA
         this.setLocationRelativeTo(null); // CENTRAR LA FINESTRA
         this.setTitle("PROJECTE UF5 - AMELICH"); // DEFINIM EL TITOL DE LA FINESTRA

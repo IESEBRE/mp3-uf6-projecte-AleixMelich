@@ -114,6 +114,8 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         campNota.setSelectionStart(0);
                         campNota.setSelectionEnd(campNota.getText().length());
                         campNota.requestFocus();
+                    } catch (DAOException ex) {
+                        throw new RuntimeException(ex);
                     }
                 }
             }
@@ -148,9 +150,11 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             /**
              * @return si tot està correcte, insereix un nou alumne a la taula.
              */
-            private void insertAlumne() throws ParseException {
+            private void insertAlumne() throws ParseException, DAOException {
                 Double nota = parsearIVerificarNota(campNota.getText());
+                Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
                 model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected()});
+                dadesAlumnes.save(al);
                 JOptionPane.showMessageDialog(null,"Has inscrit un nou alumne","Inscripció correcta",JOptionPane.INFORMATION_MESSAGE);
                 campNom.setText("");
                 campNota.setText("");
