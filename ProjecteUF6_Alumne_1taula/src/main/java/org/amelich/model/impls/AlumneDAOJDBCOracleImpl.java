@@ -1,13 +1,12 @@
-package org.example.model.impls;
+package org.amelich.model.impls;
 
-import org.example.model.daos.DAO;
-import org.example.model.entities.Alumne;
-import org.example.model.exceptions.DAOException;
+import org.amelich.model.daos.DAO;
+import org.amelich.model.entities.Alumne;
+import org.amelich.model.exceptions.DAOException;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
 public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
 
@@ -70,8 +69,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         ) {
 
             while (rs.next()) {
-                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"),
-                        new TreeSet<Alumne.Matricula>()));
+                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota")));
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
