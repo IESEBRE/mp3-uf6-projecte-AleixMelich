@@ -15,6 +15,7 @@ public class Alumne {
     private String nomCognom;
     private double nota;
     private boolean fct;
+    private int fct1;
 
     public Alumne() {
     }
@@ -29,6 +30,13 @@ public class Alumne {
         this.nomCognom = nomCognom;
         this.nota = nota;
         this.fct = fct;
+    }
+
+    public Alumne(long id, String nomCognom, double nota, int fct1) {
+        this.id = id;
+        this.nomCognom = nomCognom;
+        this.nota = nota;
+        this.fct1 = fct1;
     }
 
     public Alumne(long id, String nomCognom) {
@@ -75,5 +83,12 @@ public class Alumne {
     }
     public void setFct(boolean fct) {
         this.fct = fct;
+    }
+
+    public int getFct1() {
+        return fct1;
+    }
+    public void setFct1(int fct1) {
+        this.fct1 = fct1;
     }
 }

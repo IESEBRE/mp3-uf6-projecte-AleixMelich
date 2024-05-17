@@ -32,11 +32,11 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st = con.createStatement();
 //            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
 //            st.setLong(1, id);
-            rs = st.executeQuery("SELECT * FROM ALUMNES1");
+            rs = st.executeQuery("SELECT * FROM ALUMNES2");
 //            estudiant = new Alumne(rs.getLong(1), rs.getString(2));
 //            st.close();
             if (rs.next()) {
-                estudiant = new Alumne(Long.valueOf(rs.getString(1)), rs.getString(2));
+                estudiant = new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"), rs.getBoolean("fct"));
             }
         } catch (SQLException throwables) {
             throw new DAOException(1);
@@ -64,12 +64,12 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
                 "C##HR",
                 "HR"
         );
-             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES1");
+             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES2");
              ResultSet rs = st.executeQuery();
         ) {
 
             while (rs.next()) {
-                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"),rs.getInt("fct") == 1));
+                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"), rs.getBoolean("fct")));
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
@@ -90,7 +90,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
 
     @Override
     public void save(Alumne obj) throws DAOException {
-        String insertSQL = "INSERT INTO ALUMNES1 (id, nom, nota, fct) VALUES (?,?,?,?)";
+        String insertSQL = "INSERT INTO ALUMNES2 (id, nom, nota, fct) VALUES (?,?,?,?)";
         try (Connection con = DriverManager.getConnection(
                 "jdbc:oracle:thin:@//localhost:1521/xe",
                 "C##HR",
