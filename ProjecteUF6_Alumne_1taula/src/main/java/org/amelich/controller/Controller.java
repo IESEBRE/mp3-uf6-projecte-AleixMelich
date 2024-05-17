@@ -41,6 +41,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         //Si no hem tingut cap poroblema amb la BD, mostrem la finestra
         view.setVisible(true);
 
+
     }
 
     private void lligaVistaModel() {
@@ -56,9 +57,9 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         JTable taula = view.getTaula();
         taula.setModel(this.modelComponentsVisuals.getModel());
         //Amago la columna que conté l'objecte alumne
-        taula.getColumnModel().getColumn(3).setMinWidth(0);
-        taula.getColumnModel().getColumn(3).setMaxWidth(0);
-        taula.getColumnModel().getColumn(3).setPreferredWidth(0);
+        taula.getColumnModel().getColumn(4).setMinWidth(0);
+        taula.getColumnModel().getColumn(4).setMaxWidth(0);
+        taula.getColumnModel().getColumn(4).setPreferredWidth(0);
 
 
         //5. Necessari per a que Controller reaccione davant de canvis a les propietats lligades
@@ -93,6 +94,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         // CONFIGURACIONS DE LA TAULA
         configureTable(taula);
 
+        final long[] ultimaId = {0}; // Aquesta és la nova variable que he afegit per a que em guardi l'últim id que s'ha introduït a la taula.
 
         // CODI DEL CLIC AL BOTO INSERTAR
         insertarButton.addActionListener(new ActionListener() {
@@ -152,14 +154,15 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
              */
             private void insertAlumne() throws ParseException, DAOException {
                 Double nota = parsearIVerificarNota(campNota.getText());
-                Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
-                model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected()});
-                dadesAlumnes.save(al);
+                Alumne al = new Alumne(ultimaId[0] + 1, campNom.getText(), nota, SI_CheckBox.isSelected());
+                model.addRow(new Object[]{ultimaId[0] + 1,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
+                ultimaId[0] = al.getId(); // Actualitzem ultimaId amb l'ID de l'alumne que acabem d'afegir
                 JOptionPane.showMessageDialog(null,"Has inscrit un nou alumne","Inscripció correcta",JOptionPane.INFORMATION_MESSAGE);
                 campNom.setText("");
                 campNota.setText("");
                 SI_CheckBox.setSelected(false);
                 campNom.requestFocus();
+                dadesAlumnes.save(al);
             }
 
         });
@@ -191,9 +194,9 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
              * @return Omple els camps amb les dades de la fila seleccionada.
              */
             private void emplenarCamps(int fila) {
-                campNom.setText(model.getValueAt(fila, 0).toString());
-                campNota.setText(model.getValueAt(fila, 1).toString().replaceAll("\\.", ","));
-                SI_CheckBox.setSelected((Boolean) model.getValueAt(fila, 2));
+                campNom.setText(model.getValueAt(fila, 1).toString());
+                campNota.setText(model.getValueAt(fila, 2).toString().replaceAll("\\.", ","));
+                SI_CheckBox.setSelected((Boolean) model.getValueAt(fila, 3));
             }
         });
 

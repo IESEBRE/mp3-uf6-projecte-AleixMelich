@@ -32,7 +32,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st = con.createStatement();
 //            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
 //            st.setLong(1, id);
-            rs = st.executeQuery("SELECT * FROM ALUMNES");
+            rs = st.executeQuery("SELECT * FROM ALUMNES1");
 //            estudiant = new Alumne(rs.getLong(1), rs.getString(2));
 //            st.close();
             if (rs.next()) {
@@ -64,12 +64,12 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
                 "C##HR",
                 "HR"
         );
-             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES");
+             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES1");
              ResultSet rs = st.executeQuery();
         ) {
 
             while (rs.next()) {
-                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"),rs.getBoolean("fct")));
+                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"),rs.getInt("fct") == 1));
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
@@ -90,7 +90,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
 
     @Override
     public void save(Alumne obj) throws DAOException {
-        String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
+        String insertSQL = "INSERT INTO ALUMNES1 (id, nom, nota, fct) VALUES (?,?,?,?)";
         try (Connection con = DriverManager.getConnection(
                 "jdbc:oracle:thin:@//localhost:1521/xe",
                 "C##HR",
@@ -101,10 +101,11 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st.setLong(1, obj.getId());
             st.setString(2, obj.getNomCognom());
             st.setDouble(3, obj.getNota());
-            st.setBoolean(4, obj.isFct());
+            st.setInt(4, obj.isFct() ? 1 : 0);
             st.executeUpdate();
         } catch (SQLException throwables) {
-            throw new DAOException(1);
+            //throw new DAOException(1);
+            System.out.println(throwables.getMessage());
         }
     }
 }

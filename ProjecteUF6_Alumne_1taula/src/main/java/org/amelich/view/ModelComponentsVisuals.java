@@ -19,7 +19,7 @@ public class ModelComponentsVisuals {
      */
     public ModelComponentsVisuals() {
 
-        model=new DefaultTableModel(new Object[]{"NOM","NOTA","FCT","Object"},0){
+        model=new DefaultTableModel(new Object[]{"ID","NOM","NOTA","FCT","Object"},0){
             @Override
             public boolean isCellEditable(int row, int column) {
                 // LES CELES NO SON EDITABLES
@@ -31,10 +31,12 @@ public class ModelComponentsVisuals {
             public Class getColumnClass(int column) {
                 switch (column) {
                     case 0:
-                        return String.class;
+                        return Integer.class;
                     case 1:
-                        return Double.class;
+                        return String.class;
                     case 2:
+                        return Double.class;
+                    case 3:
                         return Boolean.class;
                     default:
                         return Object.class;
