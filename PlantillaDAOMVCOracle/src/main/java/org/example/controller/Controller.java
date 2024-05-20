@@ -81,7 +81,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             modelTaulaAlumne.addRow(new Object[]{estudiant.getNom(), estudiant.getPes(), true, estudiant});
         }
     }
-
+ b+
     private void afegirListeners() {
 
         ModelComponentsVisuals modelo = this.modelComponentsVisuals;

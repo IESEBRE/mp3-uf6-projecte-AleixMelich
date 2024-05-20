@@ -69,7 +69,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
         // Fill the table model with data from the collection
         for (Alumne estudiant : all) {
-            modelTaulaAlumne.addRow(new Object[]{estudiant.getNomCognom(), estudiant.getNota(), true, estudiant});
+            modelTaulaAlumne.addRow(new Object[]{estudiant.getId(), estudiant.getNomCognom(), estudiant.getNota(), estudiant.isFct(), estudiant});
         }
     }
 

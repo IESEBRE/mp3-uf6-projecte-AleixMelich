@@ -1,5 +1,6 @@
 package org.amelich.model.impls;
 
+import org.amelich.controller.DBConnect;
 import org.amelich.model.daos.DAO;
 import org.amelich.model.entities.Alumne;
 import org.amelich.model.exceptions.DAOException;
@@ -23,20 +24,19 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         //Accés a la BD usant l'API JDBC
         try {
 
-            con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@//localhost:1521/xe",
-                    "C##HR",
-                    "HR"
-            );
+            con = DBConnect.getConnection();
 //            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
             st = con.createStatement();
 //            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
 //            st.setLong(1, id);
-            rs = st.executeQuery("SELECT * FROM ALUMNES2");
+            rs = st.executeQuery("SELECT * FROM ALUMNES");
 //            estudiant = new Alumne(rs.getLong(1), rs.getString(2));
 //            st.close();
             if (rs.next()) {
-                estudiant = new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"), rs.getBoolean("fct"));
+                estudiant = new Alumne(rs.getLong("id"),
+                        rs.getString("nom"),
+                        rs.getDouble("nota"),
+                        rs.getBoolean("fct"));
             }
         } catch (SQLException throwables) {
             throw new DAOException(1);
@@ -59,17 +59,16 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         List<Alumne> estudiants = new ArrayList<>();
 
         //Accés a la BD usant l'API JDBC
-        try (Connection con = DriverManager.getConnection(
-                "jdbc:oracle:thin:@//localhost:1521/xe",
-                "C##HR",
-                "HR"
-        );
-             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES2");
+        try (Connection con = DBConnect.getConnection();
+             PreparedStatement st = con.prepareStatement("SELECT * FROM ALUMNES");
              ResultSet rs = st.executeQuery();
         ) {
 
             while (rs.next()) {
-                estudiants.add(new Alumne(rs.getLong("id"), rs.getString("nom"),rs.getDouble("nota"), rs.getBoolean("fct")));
+                estudiants.add(new Alumne(rs.getLong("id"),
+                        rs.getString("nom"),
+                        rs.getDouble("nota"),
+                        rs.getBoolean("fct")));
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
@@ -83,19 +82,13 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             }
             throw new DAOException(tipoError);
         }
-
-
         return estudiants;
     }
 
     @Override
     public void save(Alumne obj) throws DAOException {
-        String insertSQL = "INSERT INTO ALUMNES2 (id, nom, nota, fct) VALUES (?,?,?,?)";
-        try (Connection con = DriverManager.getConnection(
-                "jdbc:oracle:thin:@//localhost:1521/xe",
-                "C##HR",
-                "HR"
-        );
+        String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
+        try (Connection con = DBConnect.getConnection();
              PreparedStatement st = con.prepareStatement(insertSQL);
         ) {
             st.setLong(1, obj.getId());
