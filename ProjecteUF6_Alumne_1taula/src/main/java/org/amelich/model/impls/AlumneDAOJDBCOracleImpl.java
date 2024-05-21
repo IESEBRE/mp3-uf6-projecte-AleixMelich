@@ -25,13 +25,8 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         try {
 
             con = DBConnect.getConnection();
-//            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
             st = con.createStatement();
-//            st = con.prepareStatement("SELECT * FROM estudiant WHERE id=?;");
-//            st.setLong(1, id);
-            rs = st.executeQuery("SELECT * FROM ALUMNES");
-//            estudiant = new Alumne(rs.getLong(1), rs.getString(2));
-//            st.close();
+            rs = st.executeQuery("SELECT * FROM ALUMNES WHERE id=?");
             if (rs.next()) {
                 estudiant = new Alumne(rs.getLong("id"),
                         rs.getString("nom"),
@@ -72,7 +67,6 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             }
         } catch (SQLException throwables) {
             int tipoError = throwables.getErrorCode();
-            //System.out.println(tipoError+" "+throwables.getMessage());
             switch(throwables.getErrorCode()){
                 case 17002: //l'he obtingut posant un sout en el throwables.getErrorCode()
                     tipoError = 0;
@@ -85,6 +79,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         return estudiants;
     }
 
+    //CODI D'AFEGIR UN NOU ALUMNE A LA BASE DE DADES
     @Override
     public void save(Alumne obj) throws DAOException {
         String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
@@ -99,6 +94,39 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         } catch (SQLException throwables) {
             //throw new DAOException(1);
             System.out.println(throwables.getMessage());
+        }
+    }
+
+    //CODI PER MODIFICAR LES DADES D'UN ALUMNE A LA BASE DE DADES
+    @Override
+    public void update(Alumne obj) throws DAOException {
+        String updateSQL = "UPDATE ALUMNES SET nom=?, nota=?, fct=? WHERE id=?";
+        try (Connection con = DBConnect.getConnection();
+             PreparedStatement st = con.prepareStatement(updateSQL);
+        ) {
+            st.setString(1, obj.getNomCognom());
+            st.setDouble(2, obj.getNota());
+            st.setInt(3, obj.isFct() ? 1 : 0);
+            st.setLong(4, obj.getId());
+            st.executeUpdate();
+        } catch (SQLException throwables) {
+            //throw new DAOException(1);
+            System.out.println(throwables.getMessage());
+
+        }
+    }
+
+    //CODI PER ELIMINAR UN ALUMNE DE LA BASE DE DADES
+    @Override
+    public void delete(Long id) throws DAOException {
+        String deleteSQL = "DELETE FROM ALUMNES WHERE id=?";
+        try (Connection con = DBConnect.getConnection();
+             PreparedStatement st = con.prepareStatement(deleteSQL);
+        ) {
+            st.setLong(1, id);
+            st.executeUpdate();
+        } catch (SQLException throwables) {
+            throw new DAOException(1);
         }
     }
 }

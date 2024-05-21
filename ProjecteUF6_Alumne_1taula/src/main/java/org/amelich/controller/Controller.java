@@ -203,16 +203,17 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
         // CODI DEL BOTO BORRAR
         borrarButton.addActionListener(new ActionListener() {
-            /**
-             * Invoked when an action occurs.
-             *
-             * @param e the event to be processed
-             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("S'ha clicat el boto de BORRAR");
                 int filaSel = taula.getSelectedRow();
                 if(filaSel!=-1){
+                    Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
+                    try {
+                        dadesAlumnes.delete(idEstudiant);
+                    } catch (DAOException daoException) {
+                        JOptionPane.showMessageDialog(null, "Error al esborrar l'estudiant de la base de dades", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
                     model.removeRow(filaSel);
                     campNom.setText("");
                     campNota.setText("");
@@ -226,11 +227,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
         // CODI DEL BOTO MODIFICAR
         modificarButton.addActionListener(new ActionListener() {
-            /**
-             * Invoked when an action occurs.
-             *
-             * @param e the event to be processed
-             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("S'ha MODIFICAT un insert");
@@ -240,19 +236,23 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         JOptionPane.showMessageDialog(null,"No olvidis emplenar tots els camps.", "Avís", JOptionPane.WARNING_MESSAGE);
                     }
                     else {
-                        actualitzaFila();
+                        try {
+                            actualitzaFila();
+                        } catch (DAOException daoException) {
+                            JOptionPane.showMessageDialog(null, "Error al actualizar el estudiante en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
                 }
                 else JOptionPane.showMessageDialog(null, "Per modificar una fila l'has de seleccionar a la taula", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-            /**
-             * @return Actualitza la fila seleccionada amb les dades dels camps.
-             */
-            private void actualitzaFila() {
+            private void actualitzaFila() throws DAOException {
                 int filaSel = taula.getSelectedRow();
+                Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
+                Alumne al = new Alumne(idEstudiant, campNom.getText(), Double.valueOf(campNota.getText()), SI_CheckBox.isSelected());
+                dadesAlumnes.update(al);
                 model.removeRow(filaSel);
-                model.insertRow(filaSel, new Object[]{campNom.getText(), Double.valueOf(campNota.getText()), SI_CheckBox.isSelected()});
+                model.insertRow(filaSel, new Object[]{idEstudiant, campNom.getText(), Double.valueOf(campNota.getText()), SI_CheckBox.isSelected(), al});
                 campNom.setText("");
                 campNota.setText("");
                 SI_CheckBox.setSelected(false);
