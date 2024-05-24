@@ -30,9 +30,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         this.dadesAlumnes = dadesAlumnes;
         this.view = view;
 
-        //5. Necessari per a que Controller reaccione davant de canvis a les propietats lligades
-        canvis.addPropertyChangeListener(this);
-
         lligaVistaModel();
 
         afegirListeners();

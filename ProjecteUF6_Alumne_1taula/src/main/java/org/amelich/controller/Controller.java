@@ -61,9 +61,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         taula.getColumnModel().getColumn(4).setMaxWidth(0);
         taula.getColumnModel().getColumn(4).setPreferredWidth(0);
 
-
-        //5. Necessari per a que Controller reaccione davant de canvis a les propietats lligades
-        canvis.addPropertyChangeListener(this);
     }
     private void setModelTaulaAlumne(DefaultTableModel modelTaulaAlumne, List<Alumne> all) {
 
@@ -281,7 +278,8 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                     NumberFormat num=NumberFormat.getNumberInstance(Locale.getDefault());
                     double nota= num.parse(campNota.getText().trim()).doubleValue();
                     if (nota<0 || nota>10) {
-                        JOptionPane.showMessageDialog(null,"Has d'introduir una nota correcta i si te decimals separar-la per comes.", "Avís", JOptionPane.WARNING_MESSAGE);
+                        //JOptionPane.showMessageDialog(null,"Has d'introduir una nota correcta i si te decimals separar-la per comes.", "Avís", JOptionPane.WARNING_MESSAGE);
+                        setExcepcio(new DAOException(10));
                     }
                 } catch (ParseException ignored) {}
             }
@@ -462,16 +460,18 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         System.exit(1);
                         break;
-                    case 1:
+                    case 10, 11, 12 , 13,19:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         break;
-                    case 2:
+                    case 20:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         //this.view.getCampNom().setText(rebuda.getMissatge());
                         this.view.getCampNom().setSelectionStart(0);
                         this.view.getCampNom().setSelectionEnd(this.view.getCampNom().getText().length());
                         this.view.getCampNom().requestFocus();
-
+                        break;
+                    case default:
+                        JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         break;
                 }
             }

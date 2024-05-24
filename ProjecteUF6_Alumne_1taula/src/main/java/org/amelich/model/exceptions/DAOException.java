@@ -10,6 +10,14 @@ public class DAOException extends Exception{
     static {
         missatges.put(0, "Error al connectar a la BD!!");
         missatges.put(1, "Restricció d'integritat violada - clau primària duplicada");
+
+        // 10-19 -- ERRORS CAMP NOTA
+        missatges.put(10, "Has d'introduir una nota correcta i si te decimals separar-la per comes.");
+
+        // 20-29 -- ERRORS CAMP NOM
+
+
+
         missatges.put(904, "Nom de columna no vàlid");
         missatges.put(936, "Falta expressió en l'ordre SQL");
         missatges.put(942, "La taula o la vista no existeix");
