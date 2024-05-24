@@ -110,9 +110,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st.setLong(4, obj.getId());
             st.executeUpdate();
         } catch (SQLException throwables) {
-            //throw new DAOException(1);
-            System.out.println(throwables.getMessage());
-
+            throw new DAOException(1);
         }
     }
 

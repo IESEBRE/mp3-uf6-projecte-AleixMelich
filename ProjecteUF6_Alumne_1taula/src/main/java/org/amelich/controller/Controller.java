@@ -460,17 +460,28 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         System.exit(1);
                         break;
-                    case 10, 11, 12 , 13,19:
+                    case 5:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
+                        if (this.view.getCampNom().getText().isBlank()) {
+                            this.view.getCampNom().requestFocus();
+                        } else {
+                            this.view.getCampNota().requestFocus();
+                        }
                         break;
-                    case 20:
+                    case 10, 11, 12, 13, 14, 15, 16, 17, 18, 19:
+                        JOptionPane.showMessageDialog(null, rebuda.getMessage());
+                        this.view.getCampNota().setSelectionStart(0);
+                        this.view.getCampNota().setSelectionEnd(this.view.getCampNota().getText().length());
+                        this.view.getCampNota().requestFocus();
+                        break;
+                    case 20, 21, 22, 23, 24, 25, 26, 27, 28, 29:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         //this.view.getCampNom().setText(rebuda.getMissatge());
                         this.view.getCampNom().setSelectionStart(0);
                         this.view.getCampNom().setSelectionEnd(this.view.getCampNom().getText().length());
                         this.view.getCampNom().requestFocus();
                         break;
-                    case default:
+                    default:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
                         break;
                 }

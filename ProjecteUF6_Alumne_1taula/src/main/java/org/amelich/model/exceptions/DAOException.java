@@ -11,6 +11,8 @@ public class DAOException extends Exception{
         missatges.put(0, "Error al connectar a la BD!!");
         missatges.put(1, "Restricció d'integritat violada - clau primària duplicada");
 
+        missatges.put(5, "Falta omplir alguna dada, revisa-ho.");
+
         // 10-19 -- ERRORS CAMP NOTA
         missatges.put(10, "Has d'introduir una nota correcta i si te decimals separar-la per comes.");
 
