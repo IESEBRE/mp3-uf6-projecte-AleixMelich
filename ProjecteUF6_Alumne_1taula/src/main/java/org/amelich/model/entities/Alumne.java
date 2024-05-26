@@ -48,6 +48,13 @@ public class Alumne {
         this.fct = fct;
     }
 
+    public Alumne(Long id, String nomCognom, String nota, boolean fct) {
+        this.id = id;
+        this.nomCognom = nomCognom;
+        this.nota = Double.parseDouble(nota);
+        this.fct = fct;
+    }
+
 
     public Long getId() {
         return id;

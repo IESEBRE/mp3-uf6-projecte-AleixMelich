@@ -81,7 +81,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
 
     //CODI D'AFEGIR UN NOU ALUMNE A LA BASE DE DADES
     @Override
-    public void save(Alumne obj) throws DAOException {
+    public void insert(Alumne obj) throws DAOException {
         String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
         try (Connection con = DBConnect.getConnection();
              PreparedStatement st = con.prepareStatement(insertSQL);
@@ -110,7 +110,9 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st.setLong(4, obj.getId());
             st.executeUpdate();
         } catch (SQLException throwables) {
-            throw new DAOException(1);
+            //throw new DAOException(1);
+            System.out.println(throwables.getMessage());
+
         }
     }
 

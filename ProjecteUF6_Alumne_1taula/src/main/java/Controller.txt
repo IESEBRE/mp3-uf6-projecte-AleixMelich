@@ -1,9 +1,7 @@
-package org.amelich.controller;
-
 import org.amelich.model.entities.Alumne;
 import org.amelich.model.exceptions.DAOException;
-import org.amelich.view.ModelComponentsVisuals;
 import org.amelich.model.impls.AlumneDAOJDBCOracleImpl;
+import org.amelich.view.ModelComponentsVisuals;
 import org.amelich.view.ViewPestanya;
 
 import javax.swing.*;
@@ -13,6 +11,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.List;
@@ -101,20 +100,65 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("S'ha clicat el boto de INSERTAR");
+
+                if (insertCorrecte()) {
                     try {
-                        double nota = validarDades(campNom.getText(), campNota.getText(), model);
-                        Alumne al = new Alumne(ultimaId[0] + 1, campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{ultimaId[0] + 1,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
-                        ultimaId[0] = al.getId(); // Actualitzem ultimaId amb l'ID de l'alumne que acabem d'afegir
-                        dadesAlumnes.insert(al);
-
-                        JOptionPane.showMessageDialog(null, "Has inscrit un nou alumne", "Inscripció correcta", JOptionPane.INFORMATION_MESSAGE);
-                        llimpiarCampsAlumnes();
-
+                        if (!nomRepetit()) {
+                            insertAlumne();
+                        }
+                    } catch (ParseException ex) {
+                        campNota.setSelectionStart(0);
+                        campNota.setSelectionEnd(campNota.getText().length());
+                        campNota.requestFocus();
                     } catch (DAOException ex) {
-                        setExcepcio(ex);
+                        throw new RuntimeException(ex);
                     }
                 }
+            }
+
+            /**
+             * @return si algun dels camps està buit, mostra un missatge d'error.
+             */
+            private boolean insertCorrecte() {
+                if (campNom.getText().isBlank() || campNota.getText().isBlank()){
+                    JOptionPane.showMessageDialog(null,"No olvidis emplenar tots els camps.", "Avís", JOptionPane.WARNING_MESSAGE);
+                    return false;
+                }
+                return true;
+            }
+
+            /**
+             * @return si el nom està repetit, mostra un missatge d'error.
+             */
+            private boolean nomRepetit() {
+                for (int i = 0; i < model.getRowCount(); i++) {
+                    if (campNom.getText().equals(model.getValueAt(i, 0))) {
+                        JOptionPane.showMessageDialog(null, "Aquest nom ja esta inscrit a la taula, canvial.", "Error", JOptionPane.ERROR_MESSAGE);
+                        campNom.setSelectionStart(0);
+                        campNom.setSelectionEnd(campNom.getText().length());
+                        campNom.requestFocus();
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /**
+             * @return si tot està correcte, insereix un nou alumne a la taula.
+             */
+            private void insertAlumne() throws ParseException, DAOException {
+                double nota = parsearIVerificarNota(campNota.getText());
+                Alumne al = new Alumne(ultimaId[0] + 1, campNom.getText(), nota, SI_CheckBox.isSelected());
+                model.addRow(new Object[]{ultimaId[0] + 1,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
+                ultimaId[0] = al.getId(); // Actualitzem ultimaId amb l'ID de l'alumne que acabem d'afegir
+                JOptionPane.showMessageDialog(null,"Has inscrit un nou alumne","Inscripció correcta",JOptionPane.INFORMATION_MESSAGE);
+                campNom.setText("");
+                campNota.setText("");
+                SI_CheckBox.setSelected(false);
+                campNom.requestFocus();
+                dadesAlumnes.save(al);
+            }
+
         });
 
 
@@ -133,7 +177,10 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 if (filaSel != -1) {
                     emplenarCamps(filaSel);
                 } else {
-                    llimpiarCampsAlumnes();
+                    campNom.setText("");
+                    campNota.setText("");
+                    SI_CheckBox.setSelected(false);
+                    campNom.requestFocus();
                 }
             }
 
@@ -153,18 +200,21 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("S'ha clicat el boto de BORRAR");
-
                 int filaSel = taula.getSelectedRow();
-                if (filaSel != -1) {
-                    Long idEstudiant = (Long) model.getValueAt(filaSel, 0);
+                if(filaSel!=-1){
+                    Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
                     try {
                         dadesAlumnes.delete(idEstudiant);
                     } catch (DAOException daoException) {
                         JOptionPane.showMessageDialog(null, "Error al esborrar l'estudiant de la base de dades", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                     model.removeRow(filaSel);
-                    llimpiarCampsAlumnes();
-                } else setExcepcio(new DAOException(100));
+                    campNom.setText("");
+                    campNota.setText("");
+                    SI_CheckBox.setSelected(false);
+                    campNom.requestFocus();
+                }
+                else JOptionPane.showMessageDialog(null, "Per borrar una fila l'has de seleccionar a la taula", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -176,19 +226,36 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 System.out.println("S'ha MODIFICAT un insert");
                 int filaSel = taula.getSelectedRow();
                 if(filaSel != -1){
-                    try {
-                        double nota = validarDades(campNom.getText(), campNota.getText(), model);
-                        Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
-                        Alumne al = new Alumne(idEstudiant, campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{idEstudiant,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
-                        dadesAlumnes.update(al);
-                        model.removeRow(filaSel);
-                        JOptionPane.showMessageDialog(null, "Has modificat l'alumne", "Modificació correcta", JOptionPane.INFORMATION_MESSAGE);
-                        llimpiarCampsAlumnes();
-                    } catch (DAOException ex) {
-                        setExcepcio(ex);
+                    if (campNom.getText().isBlank() || campNota.getText().isBlank()) {
+                        JOptionPane.showMessageDialog(null,"No olvidis emplenar tots els camps.", "Avís", JOptionPane.WARNING_MESSAGE);
                     }
-                } else setExcepcio(new DAOException(100));
+                    else {
+                        try {
+                            actualitzaFila();
+                        } catch (DAOException | ParseException daoException) {
+                            //JOptionPane.showMessageDialog(null, "Error al actualizar el estudiante en la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+                            System.out.println(daoException.getMessage());
+
+                        }
+                    }
+                }
+                else JOptionPane.showMessageDialog(null, "Per modificar una fila l'has de seleccionar a la taula", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            private void actualitzaFila() throws DAOException, ParseException {
+                int filaSel = taula.getSelectedRow();
+                String entradaNota = campNota.getText().replace(',', '.');
+                Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
+                dadesAlumnes.update(new Alumne(idEstudiant, campNom.getText(), entradaNota, SI_CheckBox.isSelected()));
+                String entradaNota1 = campNota.getText().replace('.', ',');
+                double nota1 = parsearIVerificarNota(entradaNota1);
+                Alumne al = new Alumne(idEstudiant, campNom.getText(), nota1, SI_CheckBox.isSelected());
+                model.removeRow(filaSel);
+                model.insertRow(filaSel, new Object[]{idEstudiant, campNom.getText(), Double.valueOf(campNota.getText()), SI_CheckBox.isSelected(), al});
+                campNom.setText("");
+                campNota.setText("");
+                SI_CheckBox.setSelected(false);
+                campNom.requestFocus();
             }
         });
 
@@ -206,13 +273,14 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 super.focusLost(e);
 
                 if (!campNota.getText().matches("[0-9]+([.,][0-9]+)?")) {
-                    setExcepcio(new DAOException(10));
+                    JOptionPane.showMessageDialog(null,"Has d'introduir una nota correcta i si te decimals separar-la per comes.", "Avís", JOptionPane.WARNING_MESSAGE);
                 }
 
                 try {
                     NumberFormat num=NumberFormat.getNumberInstance(Locale.getDefault());
                     double nota= num.parse(campNota.getText().trim()).doubleValue();
                     if (nota<0 || nota>10) {
+                        //JOptionPane.showMessageDialog(null,"Has d'introduir una nota correcta i si te decimals separar-la per comes.", "Avís", JOptionPane.WARNING_MESSAGE);
                         setExcepcio(new DAOException(10));
                     }
                 } catch (ParseException ignored) {}
@@ -233,7 +301,86 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
                 String nom=(campNom.getText());
                 if (nom.matches(".*\\d.*")){
-                    setExcepcio(new DAOException(22));
+                    JOptionPane.showMessageDialog(null,"No pots introduir cap numero en aquest camp.", "Avís", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+
+// CODI DEL BOTO EXPORTAR
+        exportarButton.addActionListener(new ActionListener() {
+            /**
+             * Invoked when an action occurs.
+             *
+             * @param e the event to be processed
+             * @return Exporta les dades a un fitxer de text.
+             */
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("S'ha clicat el boto de EXPORTAR");
+
+                if (model.getRowCount() > 0) {
+                    File arxiu = seleccionarArxiu();
+                    if (arxiu != null) {
+                        PrintWriter writer = crearPrintWriter(arxiu);
+                        if (writer != null) {
+                            escriureFiles(writer);
+                            JOptionPane.showMessageDialog(null, "Fitxer guardat amb exit amb el nom: " + arxiu.getName() +  "\n" + "A la ruta: " + arxiu.getAbsolutePath());
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "No hi han dades per exportar.","Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+
+            /**
+             * @return Retorna el fitxer seleccionat.
+             */
+            private File seleccionarArxiu() {
+                JFileChooser fitxerElegit = new JFileChooser();
+                fitxerElegit.setCurrentDirectory(new File("./src/main/resources/"));
+                fitxerElegit.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fitxerElegit.setDialogTitle("Guardar arxiu de sortida");
+
+                int userSelection = fitxerElegit.showSaveDialog(null);
+                if (userSelection == JFileChooser.APPROVE_OPTION) {
+                    File arxiu = fitxerElegit.getSelectedFile();
+                    if (!arxiu.getAbsolutePath().endsWith(".txt")) {
+                        arxiu = new File(arxiu.getAbsolutePath() + ".txt");
+                    }
+                    return arxiu;
+                }
+                return null;
+            }
+
+            /**
+             * @param arxiu Fitxer on es guardarà la informació.
+             * @return Retorna un PrintWriter per a escriure les dades al fitxer.
+             */
+            private PrintWriter crearPrintWriter(File arxiu) {
+                try {
+                    return new PrintWriter(new BufferedWriter(new FileWriter(arxiu)));
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Error al crear el fitxer de sortida.");
+                    return null;
+                }
+            }
+
+            /**
+             * @param writer PrintWriter per a escriure les dades al fitxer.
+             * @return Escriu les dades al fitxer.
+             */
+            private void escriureFiles(PrintWriter writer) {
+                try {
+                    for (int i = 0; i < model.getRowCount(); i++) {
+                        writer.println("ENTRADA " + (i + 1));
+                        writer.println("Nom i cognom: " + model.getValueAt(i, 0));
+                        writer.println("Nota: " + model.getValueAt(i, 1));
+                        writer.println("FCT: " + model.getValueAt(i, 2));
+                        writer.println("--------------------");
+                    }
+                } finally {
+                    writer.close();
                 }
             }
         });
@@ -256,47 +403,20 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         table.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-
-    private double validarDades(String nom, String notaText, DefaultTableModel model) throws DAOException {
-        // Validar que el nom i la nota no estiguin buits
-        if (nom.isBlank() || notaText.isBlank()) {
-            throw new DAOException(5);
-        }
-
-        // Validar que el nom no contingui números
-        if (nom.matches(".*\\d.*")) {
-            throw new DAOException(22);
-        }
-
-        // Validar que el nom no estigui repetit
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if (nom.equals(model.getValueAt(i, 1))) {
-                throw new DAOException(23);
-            }
-        }
-
-        // Validar que la nota sigui un número vàlid
-        double nota;
-        try {
-            NumberFormat num = NumberFormat.getNumberInstance(Locale.getDefault());
-            nota = num.parse(notaText.trim()).doubleValue();
-            if (nota < 0 || nota > 10) {
-                throw new DAOException(10);
-            }
-        } catch (ParseException ignored) {
-            throw new DAOException(10);
+    /**
+     * Aquest mètode s'encarrega de parsejar una cadena a un doble i verificar que estigui dins del rang de 0 a 10.
+     * @param entrada La cadena que s'analitzarà.
+     * @return El valor doble analitzat.
+     * @throws ParseException Si el doble analitzat no està dins del rang de 0 a 10.
+     */
+    public double parsearIVerificarNota(String entrada) throws ParseException {
+        NumberFormat num = NumberFormat.getNumberInstance(Locale.getDefault());
+        double nota = num.parse(entrada.trim()).doubleValue();
+        if (nota < 0 || nota > 10){
+            throw new ParseException("El doble analitzat no es un numero entre 0 i 10.", 0);
         }
         return nota;
     }
-
-
-    private void llimpiarCampsAlumnes() {
-        view.getCampNom().setText("");
-        view.getCampNota().setText("");
-        view.getSI_CheckBox().setSelected(false);
-        view.getCampNom().requestFocus();
-    }
-
 
     //TRACTAMENT D'EXCEPCIONS
 
