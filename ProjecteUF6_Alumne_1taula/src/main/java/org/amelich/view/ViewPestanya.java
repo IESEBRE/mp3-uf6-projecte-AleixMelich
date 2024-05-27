@@ -10,13 +10,13 @@ public class ViewPestanya extends JFrame{
     private JButton modificarButton;
     private JButton insertarButton;
     private JButton borrarButton;
+    private JButton llimpiarButton;
 
     //PESTANYA ALUMNES 2023/2024
     private JTable taula;
     private JTextField campNom;
     private JTextField campNota;
     private JCheckBox SI_CheckBox;
-    private JButton exportarButton;
 
     //GETTERS
     public JButton getModificarButton() {
@@ -27,6 +27,9 @@ public class ViewPestanya extends JFrame{
     }
     public JButton getBorrarButton() {
         return borrarButton;
+    }
+    public JButton getLlimpiarButton() {
+        return llimpiarButton;
     }
 
     //PESTANYA ALUMNES 2023/2024
@@ -41,9 +44,6 @@ public class ViewPestanya extends JFrame{
     }
     public JCheckBox getSI_CheckBox() {
         return SI_CheckBox;
-    }
-    public JButton getExportarButton() {
-        return exportarButton;
     }
 
 
@@ -63,7 +63,7 @@ public class ViewPestanya extends JFrame{
         this.setTitle("PROJECTE UF5 - AMELICH"); // DEFINIM EL TITOL DE LA FINESTRA
         this.setIconImage(new ImageIcon("./src/main/resources/imagen.jpg").getImage()); // DEFINIM LA ICONA DE LA FINESTRA
 
-        exportarButton.setToolTipText("Boto per exportar les dades");
+        llimpiarButton.setToolTipText("Boto per exportar les dades");
     }
 
 

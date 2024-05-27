@@ -1,2 +1,0 @@
-per saber el missatge d'un error
-            System.out.println(throwables.getMessage());

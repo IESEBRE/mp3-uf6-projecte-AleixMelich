@@ -78,7 +78,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         JButton insertarButton = view.getInsertarButton();
         JButton modificarButton = view.getModificarButton();
         JButton borrarButton = view.getBorrarButton();
-        JButton exportarButton = view.getExportarButton();
+        JButton llimpiarButton = view.getLlimpiarButton();
 
         // ALUMNES 2023/2024
         JTable taula = view.getTaula();
@@ -101,14 +101,13 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             public void actionPerformed(ActionEvent e) {
                 System.out.println("S'ha clicat el boto de INSERTAR");
                     try {
-                        double nota = validarDades(campNom.getText(), campNota.getText(), model);
+                        double nota = validarDades(campNom.getText(), campNota.getText(), model, false);
                         Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected(), al});
                         dadesAlumnes.insert(al);
+                        model.addRow(new Object[]{dadesAlumnes.alumneID(al),campNom.getText(), nota, SI_CheckBox.isSelected(), al});
 
                         JOptionPane.showMessageDialog(null, "Has inscrit un nou alumne", "Inscripció correcta", JOptionPane.INFORMATION_MESSAGE);
                         llimpiarCampsAlumnes();
-
                     } catch (DAOException ex) {
                         setExcepcio(ex);
                     }
@@ -175,10 +174,13 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 int filaSel = taula.getSelectedRow();
                 if(filaSel != -1){
                     try {
-                        double nota = validarDades(campNom.getText(), campNota.getText(), model);
-                        Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected(), al});
+                        double nota = validarDades(campNom.getText(), campNota.getText(), model, true);
+                        Alumne aID = (Alumne) model.getValueAt(filaSel, 4); // Obtenim l'objecte alumne de la fila seleccionada
+                        Long idAlumne = dadesAlumnes.alumneID(aID); // Usem el metode alumneID per obtenir l'id de l'alumne proporcionat per l'objecte aID
+
+                        Alumne al = new Alumne(idAlumne, campNom.getText(), nota, SI_CheckBox.isSelected());
                         dadesAlumnes.update(al);
+                        model.addRow(new Object[]{idAlumne, campNom.getText(), nota, SI_CheckBox.isSelected(), al});
                         model.removeRow(filaSel);
                         JOptionPane.showMessageDialog(null, "Has modificat l'alumne", "Modificació correcta", JOptionPane.INFORMATION_MESSAGE);
                         llimpiarCampsAlumnes();
@@ -188,6 +190,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 } else setExcepcio(new DAOException(100));
             }
         });
+
 
 // TRACTAR EXCEPCIONS, TRY/CATCH/FINALLY
         // EN AQUEST CAS DETERMINEM QUE S'HA D'INTRODUIR UNA NOTA VALIDA (DEL 0 AL 10)
@@ -235,8 +238,34 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
             }
         });
 
-    }
 
+        // CODI DEL BOTO LLIMPIAR TAULA
+        llimpiarButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("S'ha clicat el boto de LLIMPIAR");
+                if (model.getRowCount() == 0) {
+                    setExcepcio(new DAOException(101));
+                    return;
+                }
+
+                int confirm = JOptionPane.showConfirmDialog(null, "Estàs segur que vols eliminar totes les files?", "Confirmar eliminació", JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        dadesAlumnes.deleteAll();
+                        llimpiarCampsAlumnes();
+                        while (model.getRowCount() > 0) {
+                            model.removeRow(0);
+                        }
+                        JOptionPane.showMessageDialog(null, "Totes les files han estat eliminades", "Eliminació completada", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (DAOException ex) {
+                        setExcepcio(ex);
+                    }
+                }
+
+            }
+        });
+    }
 
 
 
@@ -253,8 +282,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         table.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-
-    private double validarDades(String nom, String notaText, DefaultTableModel model) throws DAOException {
+    private double validarDades(String nom, String notaText, DefaultTableModel model, boolean isModifying) throws DAOException {
         // Validar que el nom i la nota no estiguin buits
         if (nom.isBlank() || notaText.isBlank()) {
             throw new DAOException(5);
@@ -266,9 +294,11 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         }
 
         // Validar que el nom no estigui repetit
-        for (int i = 0; i < model.getRowCount(); i++) {
-            if (nom.equals(model.getValueAt(i, 1))) {
-                throw new DAOException(23);
+        if (!isModifying) {
+            for (int i = 0; i < model.getRowCount(); i++) {
+                if (nom.equals(model.getValueAt(i, 1))) {
+                    throw new DAOException(23);
+                }
             }
         }
 
@@ -285,7 +315,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         }
         return nota;
     }
-
 
     private void llimpiarCampsAlumnes() {
         view.getCampNom().setText("");
@@ -355,7 +384,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         break;
                     case 20, 21, 22, 23, 24, 25, 26, 27, 28, 29:
                         JOptionPane.showMessageDialog(null, rebuda.getMessage());
-                        //this.view.getCampNom().setText(rebuda.getMissatge());
                         this.view.getCampNom().setSelectionStart(0);
                         this.view.getCampNom().setSelectionEnd(this.view.getCampNom().getText().length());
                         this.view.getCampNom().requestFocus();

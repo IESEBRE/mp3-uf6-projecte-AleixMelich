@@ -13,15 +13,16 @@ public class DAOException extends Exception{
 
         missatges.put(5, "Falta omplir alguna dada, revisa-ho.");
 
-        // 10-19 -- ERRORS CAMP NOTA ABANS 4
+        // 10-19 -- ERRORS CAMP NOTA
         missatges.put(10, "Has d'introduir una nota correcta (0-10) i si te decimals separar-la per comes.");
 
         // 20-29 -- ERRORS CAMP NOM
         missatges.put(22, "No pots introduir cap numero en aquest camp, nomes caracters.");
         missatges.put(23, "Aquest nom ja esta inscrit a la taula, canvial.");
 
-        // NOMES JOPTIONPANE ABANS 1
+        // NOMES JOPTIONPANE
         missatges.put(100, "Per modificar o borrar una fila l'has de seleccionar a la taula");
+        missatges.put(101, "Per llimpiar la taula han d'haber files a la taula");
 
 
         missatges.put(904, "Nom de columna no vàlid");

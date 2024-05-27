@@ -83,18 +83,16 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
     //CODI D'AFEGIR UN NOU ALUMNE A LA BASE DE DADES
     @Override
     public void insert(Alumne obj) throws DAOException {
-        String insertSQL = "INSERT INTO ALUMNES (id, nom, nota, fct) VALUES (?,?,?,?)";
+        String insertSQL = "INSERT INTO ALUMNES (nom, nota, fct) VALUES (?,?,?)";
         try (Connection con = DBConnect.getConnection();
              PreparedStatement st = con.prepareStatement(insertSQL);
         ) {
-            st.setInt(1, Types.INTEGER);
-            st.setString(2, obj.getNomCognom());
-            st.setDouble(3, obj.getNota());
-            st.setInt(4, obj.isFct() ? 1 : 0);
+            st.setString(1, obj.getNomCognom());
+            st.setDouble(2, obj.getNota());
+            st.setInt(3, obj.isFct() ? 1 : 0);
             st.executeUpdate();
         } catch (SQLException throwables) {
-            //throw new DAOException(1);
-            System.out.println(throwables.getMessage());
+            throw new DAOException(1);
         }
     }
 
@@ -108,12 +106,10 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st.setString(1, obj.getNomCognom());
             st.setDouble(2, obj.getNota());
             st.setInt(3, obj.isFct() ? 1 : 0);
-            st.setLong(4, Types.INTEGER);
+            st.setLong(4, obj.getId());
             st.executeUpdate();
         } catch (SQLException throwables) {
-            //throw new DAOException(1);
-            System.out.println(throwables.getMessage());
-
+            throw new DAOException(1);
         }
     }
 
@@ -125,6 +121,38 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
              PreparedStatement st = con.prepareStatement(deleteSQL);
         ) {
             st.setLong(1, id);
+            st.executeUpdate();
+        } catch (SQLException throwables) {
+            throw new DAOException(1);
+        }
+    }
+
+    //CODI PER TREURE LA ID DE L'ALUMNE SELECCIONAT
+    public Long alumneID(Alumne obj) throws DAOException {
+        Long id = null;
+        String selectSQL = "SELECT id FROM ALUMNES WHERE nom=? AND nota=? AND fct=?";
+        try (Connection con = DBConnect.getConnection();
+             PreparedStatement st = con.prepareStatement(selectSQL);
+        ) {
+            st.setString(1, obj.getNomCognom());
+            st.setDouble(2, obj.getNota());
+            st.setInt(3, obj.isFct() ? 1 : 0);
+            ResultSet rs = st.executeQuery();
+            if (rs.next()) {
+                id = rs.getLong("id");
+            }
+        } catch (SQLException throwables) {
+            throw new DAOException(1);
+        }
+        return id;
+    }
+
+    //CODI PER ELIMINAR TOTES FILES DE LA TAULA ALUMNES
+    public void deleteAll() throws DAOException {
+        String deleteSQL = "DELETE FROM ALUMNES";
+        try (Connection con = DBConnect.getConnection();
+             PreparedStatement st = con.prepareStatement(deleteSQL);
+        ) {
             st.executeUpdate();
         } catch (SQLException throwables) {
             throw new DAOException(1);
