@@ -6,7 +6,7 @@ import java.io.Serializable;
 /**
  * @author Aleix Melich
  * <p>
- * Aquesta classe és un POJO que representa un alumne.
+ * Aquesta classe és un POJO que representa un alumne que te una nota i si te permés fer practiques o no.
  */
 public class Alumne {
 
@@ -47,14 +47,6 @@ public class Alumne {
         this.nota = nota;
         this.fct = fct;
     }
-
-    public Alumne(Long id, String nomCognom, String nota, boolean fct) {
-        this.id = id;
-        this.nomCognom = nomCognom;
-        this.nota = Double.parseDouble(nota);
-        this.fct = fct;
-    }
-
 
     public Long getId() {
         return id;

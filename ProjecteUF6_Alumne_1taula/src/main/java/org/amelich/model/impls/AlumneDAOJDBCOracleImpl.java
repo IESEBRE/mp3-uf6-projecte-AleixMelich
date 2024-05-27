@@ -5,6 +5,7 @@ import org.amelich.model.daos.DAO;
 import org.amelich.model.entities.Alumne;
 import org.amelich.model.exceptions.DAOException;
 
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +87,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
         try (Connection con = DBConnect.getConnection();
              PreparedStatement st = con.prepareStatement(insertSQL);
         ) {
-            st.setLong(1, obj.getId());
+            st.setInt(1, Types.INTEGER);
             st.setString(2, obj.getNomCognom());
             st.setDouble(3, obj.getNota());
             st.setInt(4, obj.isFct() ? 1 : 0);
@@ -107,7 +108,7 @@ public class AlumneDAOJDBCOracleImpl implements DAO<Alumne> {
             st.setString(1, obj.getNomCognom());
             st.setDouble(2, obj.getNota());
             st.setInt(3, obj.isFct() ? 1 : 0);
-            st.setLong(4, obj.getId());
+            st.setLong(4, Types.INTEGER);
             st.executeUpdate();
         } catch (SQLException throwables) {
             //throw new DAOException(1);

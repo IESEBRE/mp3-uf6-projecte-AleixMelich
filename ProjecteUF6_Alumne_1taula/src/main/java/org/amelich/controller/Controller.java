@@ -89,7 +89,6 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         // CONFIGURACIONS DE LA TAULA
         configureTable(taula);
 
-        final long[] ultimaId = {0}; // Aquesta és la nova variable que he afegit per a que em guardi l'últim id que s'ha introduït a la taula.
 
         // CODI DEL CLIC AL BOTO INSERTAR
         insertarButton.addActionListener(new ActionListener() {
@@ -103,9 +102,8 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 System.out.println("S'ha clicat el boto de INSERTAR");
                     try {
                         double nota = validarDades(campNom.getText(), campNota.getText(), model);
-                        Alumne al = new Alumne(ultimaId[0] + 1, campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{ultimaId[0] + 1,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
-                        ultimaId[0] = al.getId(); // Actualitzem ultimaId amb l'ID de l'alumne que acabem d'afegir
+                        Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
+                        model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected(), al});
                         dadesAlumnes.insert(al);
 
                         JOptionPane.showMessageDialog(null, "Has inscrit un nou alumne", "Inscripció correcta", JOptionPane.INFORMATION_MESSAGE);
@@ -178,9 +176,8 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 if(filaSel != -1){
                     try {
                         double nota = validarDades(campNom.getText(), campNota.getText(), model);
-                        Long idEstudiant = (Long) model.getValueAt(filaSel, 0); // Asumint que l'ID és la primera columna de la taula
-                        Alumne al = new Alumne(idEstudiant, campNom.getText(), nota, SI_CheckBox.isSelected());
-                        model.addRow(new Object[]{idEstudiant,campNom.getText(), nota, SI_CheckBox.isSelected(), al});
+                        Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
+                        model.addRow(new Object[]{campNom.getText(), nota, SI_CheckBox.isSelected(), al});
                         dadesAlumnes.update(al);
                         model.removeRow(filaSel);
                         JOptionPane.showMessageDialog(null, "Has modificat l'alumne", "Modificació correcta", JOptionPane.INFORMATION_MESSAGE);
