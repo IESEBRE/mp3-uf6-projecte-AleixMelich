@@ -80,16 +80,6 @@
           <text value="Nom"/>
         </properties>
       </component>
-      <component id="8b1e6" class="javax.swing.JButton" binding="llimpiarButton">
-        <constraints>
-          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <autoscrolls value="false"/>
-          <focusCycleRoot value="false"/>
-          <text value="Llimpiar taula"/>
-        </properties>
-      </component>
       <component id="6602b" class="javax.swing.JTextField" binding="campNota">
         <constraints>
           <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
@@ -128,6 +118,24 @@
           <selected value="false"/>
           <text value=""/>
           <visible value="true"/>
+        </properties>
+      </component>
+      <component id="8b1e6" class="javax.swing.JButton" binding="llimpiarButton">
+        <constraints>
+          <grid row="4" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <autoscrolls value="false"/>
+          <focusCycleRoot value="false"/>
+          <text value="Llimpiar taula"/>
+        </properties>
+      </component>
+      <component id="222e3" class="javax.swing.JButton" binding="IDButton">
+        <constraints>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Mostrar IDS's"/>
         </properties>
       </component>
     </children>

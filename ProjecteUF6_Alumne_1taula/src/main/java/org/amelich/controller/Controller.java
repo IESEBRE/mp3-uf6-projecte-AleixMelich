@@ -25,6 +25,9 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
     private AlumneDAOJDBCOracleImpl dadesAlumnes;
     private ViewPestanya view;
 
+    // Afegeix aquesta línia a la teva classe Controller per rastrejar l'estat de la columna d'ID
+    private boolean isIDColumnVisible = false;
+
     public Controller(AlumneDAOJDBCOracleImpl dadesAlumnes, ViewPestanya view) {
         this.dadesAlumnes = dadesAlumnes;
         this.view = view;
@@ -58,6 +61,10 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         taula.getColumnModel().getColumn(4).setMinWidth(0);
         taula.getColumnModel().getColumn(4).setMaxWidth(0);
         taula.getColumnModel().getColumn(4).setPreferredWidth(0);
+        //Amago la columna que conté l'ID de l'alumne
+        taula.getColumnModel().getColumn(0).setMinWidth(0);
+        taula.getColumnModel().getColumn(0).setMaxWidth(0);
+        taula.getColumnModel().getColumn(0).setPreferredWidth(0);
 
     }
     private void setModelTaulaAlumne(DefaultTableModel modelTaulaAlumne, List<Alumne> all) {
@@ -79,6 +86,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
         JButton modificarButton = view.getModificarButton();
         JButton borrarButton = view.getBorrarButton();
         JButton llimpiarButton = view.getLlimpiarButton();
+        JButton IDButton = view.getIDButton();
 
         // ALUMNES 2023/2024
         JTable taula = view.getTaula();
@@ -88,6 +96,8 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
         // CONFIGURACIONS DE LA TAULA
         configureTable(taula);
+
+
 
 
         // CODI DEL CLIC AL BOTO INSERTAR
@@ -102,6 +112,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 System.out.println("S'ha clicat el boto de INSERTAR");
                     try {
                         double nota = validarDades(campNom.getText(), campNota.getText(), model, false);
+
                         Alumne al = new Alumne(campNom.getText(), nota, SI_CheckBox.isSelected());
                         dadesAlumnes.insert(al);
                         model.addRow(new Object[]{dadesAlumnes.alumneID(al),campNom.getText(), nota, SI_CheckBox.isSelected(), al});
@@ -182,6 +193,7 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                         dadesAlumnes.update(al);
                         model.addRow(new Object[]{idAlumne, campNom.getText(), nota, SI_CheckBox.isSelected(), al});
                         model.removeRow(filaSel);
+
                         JOptionPane.showMessageDialog(null, "Has modificat l'alumne", "Modificació correcta", JOptionPane.INFORMATION_MESSAGE);
                         llimpiarCampsAlumnes();
                     } catch (DAOException ex) {
@@ -253,11 +265,11 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
                 if (confirm == JOptionPane.YES_OPTION) {
                     try {
                         dadesAlumnes.deleteAll();
-                        llimpiarCampsAlumnes();
                         while (model.getRowCount() > 0) {
                             model.removeRow(0);
                         }
                         JOptionPane.showMessageDialog(null, "Totes les files han estat eliminades", "Eliminació completada", JOptionPane.INFORMATION_MESSAGE);
+                        llimpiarCampsAlumnes();
                     } catch (DAOException ex) {
                         setExcepcio(ex);
                     }
@@ -265,8 +277,31 @@ public class Controller implements PropertyChangeListener { //1. Implementació 
 
             }
         });
-    }
 
+
+        // CODI DEL BOTO ID
+        IDButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Canvia l'estat de la variable isIDColumnVisible
+                isIDColumnVisible = !isIDColumnVisible;
+
+                // Mostra o amaga la columna d'ID en funció de l'estat de la variable isIDColumnVisible
+                if (isIDColumnVisible) {
+                    // Mostra la columna d'ID
+                    taula.getColumnModel().getColumn(0).setMinWidth(50);
+                    taula.getColumnModel().getColumn(0).setMaxWidth(50);
+                    taula.getColumnModel().getColumn(0).setPreferredWidth(50);
+                } else {
+                    // Amaga la columna d'ID
+                    taula.getColumnModel().getColumn(0).setMinWidth(0);
+                    taula.getColumnModel().getColumn(0).setMaxWidth(0);
+                    taula.getColumnModel().getColumn(0).setPreferredWidth(0);
+                }
+            }
+        });
+
+    }
 
 
     //METODE DE CONFIGURACIÓ DE LA TAULA

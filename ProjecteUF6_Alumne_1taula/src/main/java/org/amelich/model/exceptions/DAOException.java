@@ -8,8 +8,8 @@ public class DAOException extends Exception{
     private static final Map<Integer, String> missatges = new HashMap<>();
     //num i retorna string, el map
     static {
-        missatges.put(0, "Error al connectar a la BD!!");
-        missatges.put(1, "Restricció d'integritat violada - clau primària duplicada");
+        missatges.put(0, "Connexó no establerta amb la BD, revisa-ho.");
+        missatges.put(1, "Error amb la taula, revisa-ho.");
 
         missatges.put(5, "Falta omplir alguna dada, revisa-ho.");
 
@@ -23,7 +23,7 @@ public class DAOException extends Exception{
         // NOMES JOPTIONPANE
         missatges.put(100, "Per modificar o borrar una fila l'has de seleccionar a la taula");
         missatges.put(101, "Per llimpiar la taula han d'haber files a la taula");
-
+        missatges.put(102, "Les dades de la BD no s'han carregat correctament");
 
         missatges.put(904, "Nom de columna no vàlid");
         missatges.put(936, "Falta expressió en l'ordre SQL");
