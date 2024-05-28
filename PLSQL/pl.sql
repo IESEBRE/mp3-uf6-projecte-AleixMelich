@@ -1,12 +1,20 @@
--- Poseu el codi dels procediments/funcions emmagatzemats, triggers, ..., usats al projecte
-CREATE OR REPLACE TRIGGER check_boolean
-BEFORE INSERT OR UPDATE ON ALUMNES
-FOR EACH ROW
-BEGIN
-  IF :NEW.fct NOT IN (0, 1) THEN
-    RAISE_APPLICATION_ERROR(-20001, 'El valor de fct ha de ser 0 o 1');
-  END IF;
-END;
+-- CREACIÓ DE LA TAULA ALUMNES
+CREATE TABLE ALUMNES(
+    ID NUMBER PRIMARY KEY,
+    NOM VARCHAR2(50) NOT NULL,
+    NOTA NUMBER NOT NULL,
+    FCT NUMBER(1,0) DEFAULT 0
+);
 
---
---
+-- CREACIÓ DEL TRIGGER ID_AUTO PER A LA TAULA ALUMNES
+CREATE OR REPLACE TRIGGER ID_AUTO
+    before insert
+    on ALUMNES
+    for each row
+DECLARE
+    ultima_id NUMBER;
+BEGIN
+    SELECT NVL(MAX(ID), 0) INTO ultima_id
+    FROM ALUMNES;
+    :NEW.ID:=ultima_id+1;
+END;
